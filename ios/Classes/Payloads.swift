@@ -85,7 +85,8 @@ class Account : Codable {
         claims = flattenClaims(msalClaims: msalAccount.accountClaims)
         authority = nil // not available
         id = msalAccount.identifier
-        username = msalAccount.identifier
+        //username = msalAccount.identifier // not usefull for my puprose
+        username = msalAccount.username
     }
     
     private func flattenClaims(msalClaims: [String: Any]?) -> [String: String]? {
