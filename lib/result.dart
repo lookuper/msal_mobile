@@ -9,6 +9,11 @@ class MsalMobileResult {
   MsalMobileResult(
       {required this.isSuccess, this.exception, this.innerException});
 
+  MsalMobileResult.nullResponse() :
+      isSuccess = false,
+      exception = MsalMobileException(message: "response is null"),
+      innerException = MsalMobileException(message: "response is null", innerException: MsalMobileException(message: "null"));
+
   MsalMobileResult.fromJson(Map<String, dynamic> json)
       : isSuccess = json['isSuccess'],
         exception = json['exception'] != null
@@ -26,6 +31,12 @@ class MsalMobileGetAccountResult implements MsalMobileResult {
   final MsalMobileGetAccountResultPayload? payload;
   final MsalMobileException? exception;
   final MsalMobileException? innerException;
+
+  MsalMobileGetAccountResult.nullResponse() :
+      isSuccess = false,
+      payload = null,
+      exception = MsalMobileException(message: "response is null"),
+      innerException = MsalMobileException(message: "response is null");
 
   MsalMobileGetAccountResult.fromJson(Map<String, dynamic> json)
       : isSuccess = json['isSuccess'],
@@ -49,6 +60,13 @@ class MsalMobileAuthenticationResult implements MsalMobileResult {
   final MsalMobileException? exception;
   final MsalMobileException? innerException;
   final bool? isUiRequired;
+
+  MsalMobileAuthenticationResult.nullResponse() :
+        isSuccess = false,
+        isUiRequired = false,
+        payload = null,
+        exception = MsalMobileException(message: "response is null"),
+        innerException = MsalMobileException(message: "response is null");
 
   MsalMobileAuthenticationResult.fromJson(Map<String, dynamic> json)
       : isSuccess = json['isSuccess'],

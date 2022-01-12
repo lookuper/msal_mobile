@@ -1,3 +1,4 @@
+
 import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/services.dart';
@@ -43,8 +44,8 @@ class MsalMobile {
     });
     final result = response != null
         ? MsalMobileResult.fromJson(jsonDecode(response))
-        : null;
-    if (!result!.isSuccess && result!.exception != null) {
+        : MsalMobileResult.nullResponse();
+    if (!result.isSuccess && result.exception != null) {
       throw MsalMobileException.copy(result.exception, result.innerException);
     }
     initialized = true;
@@ -81,11 +82,11 @@ class MsalMobile {
     final response = await _channel.invokeMethod('getAccount');
     final result = response != null
         ? MsalMobileGetAccountResult.fromJson(jsonDecode(response))
-        : null;
-    if (!result!.isSuccess && result!.exception != null) {
-      throw MsalMobileException.copy(result!.exception, result!.innerException);
+        : MsalMobileGetAccountResult.nullResponse();
+    if (!result.isSuccess && result.exception != null) {
+      throw MsalMobileException.copy(result.exception, result.innerException);
     }
-    return result!.payload;
+    return result.payload;
   }
 
   /// Signs a user into MSAL if there is not currently any user signed in.  This should be done prior to retrieving
@@ -103,17 +104,17 @@ class MsalMobile {
     );
     final result = response != null
         ? MsalMobileAuthenticationResult.fromJson(jsonDecode(response))
-        : null;
-    if (!result!.isSuccess && result!.exception != null) {
+        : MsalMobileAuthenticationResult.nullResponse();
+    if (!result.isSuccess && result.exception != null) {
       // check if the user is already signed in.  That could be the cause of an invalid_parameter failure from MSAL
       final signedIn = await this.getSignedIn();
       if (signedIn) {
         throw MsalMobileException.fromErrorCode(
             MsalMobileExceptionErrorCode.alreadySignedIn);
       }
-      throw MsalMobileException.copy(result!.exception, result!.innerException);
+      throw MsalMobileException.copy(result.exception, result.innerException);
     }
-    return result!.payload;
+    return result.payload;
   }
 
   /// Signs a user out of MSAL if there is currently a user signed in.
@@ -126,9 +127,9 @@ class MsalMobile {
     final response = await _channel.invokeMethod('signOut');
     final result = response != null
         ? MsalMobileResult.fromJson(jsonDecode(response))
-        : null;
-    if (!result!.isSuccess && result!.exception != null) {
-      throw MsalMobileException.copy(result!.exception, result!.innerException);
+        : MsalMobileResult.nullResponse();
+    if (!result.isSuccess && result.exception != null) {
+      throw MsalMobileException.copy(result.exception, result.innerException);
     }
   }
 
@@ -146,11 +147,11 @@ class MsalMobile {
     );
     final result = response != null
         ? MsalMobileAuthenticationResult.fromJson(jsonDecode(response))
-        : null;
-    if (!result!.isSuccess! && result!.exception != null) {
-      throw MsalMobileException.copy(result!.exception, result!.innerException);
+        : MsalMobileAuthenticationResult.nullResponse();
+    if (!result.isSuccess && result.exception != null) {
+      throw MsalMobileException.copy(result.exception, result.innerException);
     }
-    return result!.payload;
+    return result.payload;
   }
 
   /// Acquires a token silently (without UI).  An exception will be thrown if a token cannot be acquired silently.  A user must
@@ -168,11 +169,11 @@ class MsalMobile {
     );
     final result = response != null
         ? MsalMobileAuthenticationResult.fromJson(jsonDecode(response))
-        : null;
-    if (!result!.isSuccess! && result!.exception != null) {
-      throw MsalMobileException.copy(result!.exception, result!.innerException);
+        : MsalMobileAuthenticationResult.nullResponse();
+    if (!result.isSuccess && result.exception != null) {
+      throw MsalMobileException.copy(result.exception, result.innerException);
     }
-    return result!.payload;
+    return result.payload;
   }
 
   /// Attempts to acquire a token silently.  If silent token acquisition fails because the UI is required, then an attempt to acquire a token interactively will be made.
@@ -189,8 +190,8 @@ class MsalMobile {
     );
     final silentResult = silentResponse != null
         ? MsalMobileAuthenticationResult.fromJson(jsonDecode(silentResponse))
-        : null;
-    if (!silentResult!.isSuccess! && silentResult!.isUiRequired!) {
+        : MsalMobileAuthenticationResult.nullResponse();
+    if (!silentResult.isSuccess && (silentResult.isUiRequired ?? false)) {
       // acquire a token interactively
       final interactiveResponse = await _channel.invokeMethod(
         'acquireToken',
@@ -199,17 +200,17 @@ class MsalMobile {
       final interactiveResult = interactiveResponse != null
           ? MsalMobileAuthenticationResult.fromJson(
               jsonDecode(interactiveResponse))
-          : null;
-      if (!interactiveResult!.isSuccess! &&
-          interactiveResult!.exception != null) {
+          : MsalMobileAuthenticationResult.nullResponse();
+      if (!interactiveResult.isSuccess &&
+          interactiveResult.exception != null) {
         throw MsalMobileException.copy(
-            interactiveResult!.exception, interactiveResult!.innerException);
+            interactiveResult.exception, interactiveResult.innerException);
       }
-      return interactiveResult!.payload;
-    } else if (!silentResult!.isSuccess! && silentResult!.exception != null) {
+      return interactiveResult.payload;
+    } else if (!silentResult.isSuccess && silentResult.exception != null) {
       throw MsalMobileException.copy(
-          silentResult!.exception, silentResult!.innerException);
+          silentResult.exception, silentResult.innerException);
     }
-    return silentResult!.payload;
+    return silentResult.payload;
   }
 }
