@@ -52,7 +52,7 @@ class MsalMobileResultPayload : Codable {
         
         let dateFormatterPrint = DateFormatter()
         dateFormatterPrint.dateFormat = "yyyy-MM-dd HH:mm:ss"
-        self.expiresOn = dateFormatterPrint.string(from: msalResult.expiresOn)
+        self.expiresOn = dateFormatterPrint.string(from: msalResult.expiresOn!)
         
         self.currentAccount = nil
         self.accountLoaded = false
