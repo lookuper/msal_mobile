@@ -10,7 +10,7 @@ import com.microsoft.identity.client.ISingleAccountPublicClientApplication.SignO
 import com.microsoft.identity.client.SilentAuthenticationCallback;
 import com.microsoft.identity.client.exception.MsalException;
 import com.microsoft.identity.client.exception.MsalUiRequiredException;
-
+import android.os.*;
 import java.util.ArrayList;
 
 import androidx.annotation.NonNull;
@@ -22,6 +22,11 @@ import io.flutter.plugin.common.MethodChannel.Result;
 public class AuthMethodHandler implements MethodChannel.MethodCallHandler {
     private Activity mActivity;
     private Authenticator mAuth;
+    private Handler handler;
+
+    AuthMethodHandler() {
+        handler = new Handler(Looper.getMainLooper());
+    }
 
     void setActivity(@NonNull Activity activity) {
         mActivity = activity;
@@ -29,21 +34,69 @@ public class AuthMethodHandler implements MethodChannel.MethodCallHandler {
 
     private void error(@NonNull Result result, @NonNull Exception exception) {
         // even though this is an error, success is returned because a success response allows for more detail to be sent back
-        result.success(Results.MsalMobileResult.error(exception));
+        final Result res = result;
+        final Exception ex = exception;
+        handler.post(
+                new Runnable() {
+                    @Override
+                    public void run() {
+                        res.success(Results.MsalMobileResult.error(ex));
+                    }
+                });
+        //result.success(Results.MsalMobileResult.error(exception));
     }
     private void error(@NonNull Result result, @NonNull String errorCode, @NonNull String message) {
         final MsalMobileException exception = new MsalMobileException(errorCode, message);
-        result.success(Results.MsalMobileResult.error(exception));
+        final Result res = result;
+        handler.post(
+                new Runnable() {
+                    @Override
+                    public void run() {
+                        res.success(Results.MsalMobileResult.error(exception));
+                    }
+                });
+        //result.success(Results.MsalMobileResult.error(exception));
     }
     private void uiRequiredError(@NonNull Result result, @NonNull MsalUiRequiredException exception) {
         // even though this is an error, success is returned because a success response allows for more detail to be sent back
-        result.success(Results.MsalMobileResult.uiRequiredError(exception));
+        final Result res = result;
+        final Exception ex = exception;
+
+        handler.post(
+                new Runnable() {
+                    @Override
+                    public void run() {
+                        res.success(Results.MsalMobileResult.uiRequiredError(ex));
+                    }
+                });
+
+
+        //result.success(Results.MsalMobileResult.uiRequiredError(exception));
     }
     private void success(@NonNull Result result, Payloads.MsalMobileResultPayload payload) {
-        result.success(Results.MsalMobileResult.success(payload));
+        final Result res = result;
+        final Payloads.MsalMobileResultPayload  payl = payload;
+        handler.post(
+                new Runnable() {
+                    @Override
+                    public void run() {
+                        res.success(Results.MsalMobileResult.success(payl));
+                    }
+                });
+
+        //result.success(Results.MsalMobileResult.success(payload));
     }
     private void success(@NonNull Result result) {
-        result.success(Results.MsalMobileResult.success(true));
+        final Result res = result;
+        handler.post(
+                new Runnable() {
+                    @Override
+                    public void run() {
+                        res.success(Results.MsalMobileResult.success(true));
+                    }
+                });
+
+        //result.success(Results.MsalMobileResult.success(true));
     }
 
     private void handleInit(@NonNull final Result result, @Nullable final String configFilePath) {
@@ -157,6 +210,7 @@ public class AuthMethodHandler implements MethodChannel.MethodCallHandler {
     @Override
     public void onMethodCall(@NonNull MethodCall call, @NonNull Result result) {
         try {
+
             switch(call.method) {
                 case "init": {
                     final String configFilePath = call.argument("configFilePath");
